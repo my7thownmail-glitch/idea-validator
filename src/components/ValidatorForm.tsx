@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -9,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, TrendingUp } from "lucide-react";
 
 export interface FormData {
   idea: string;
@@ -17,6 +18,7 @@ export interface FormData {
   contentType: string;
   audienceLevel: string;
   goal: string;
+  trendAwareness: boolean;
 }
 
 interface ValidatorFormProps {
@@ -63,6 +65,7 @@ export function ValidatorForm({ onSubmit, isLoading }: ValidatorFormProps) {
     contentType: "",
     audienceLevel: "",
     goal: "",
+    trendAwareness: false,
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -161,6 +164,26 @@ export function ValidatorForm({ onSubmit, isLoading }: ValidatorFormProps) {
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      {/* Trend Awareness Toggle */}
+      <div className="flex items-center justify-between p-4 bg-muted/30 border border-border rounded-lg">
+        <div className="flex items-center gap-3">
+          <TrendingUp className="h-5 w-5 text-primary" />
+          <div>
+            <Label htmlFor="trend-awareness" className="text-foreground font-medium cursor-pointer">
+              Enable Trend Awareness
+            </Label>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Analyze timing relative to current content trends
+            </p>
+          </div>
+        </div>
+        <Switch
+          id="trend-awareness"
+          checked={formData.trendAwareness}
+          onCheckedChange={(checked) => setFormData({ ...formData, trendAwareness: checked })}
+        />
       </div>
 
       <Button

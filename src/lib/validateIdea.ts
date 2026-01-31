@@ -16,6 +16,7 @@ export async function validateIdea(data: FormData): Promise<ValidationResult> {
         contentType: data.contentType,
         audienceLevel: data.audienceLevel,
         goal: data.goal,
+        trendAwareness: data.trendAwareness,
       }),
     }
   );
