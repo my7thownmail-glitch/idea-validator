@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ValidatorForm, FormData } from "@/components/ValidatorForm";
 import { ValidationResults, ValidationResult } from "@/components/ValidationResults";
-import { ExtensionBanner } from "@/components/ExtensionBanner";
+import { ExtensionButton } from "@/components/ExtensionButton";
 import { validateIdea } from "@/lib/validateIdea";
 import { toast } from "sonner";
 import { Zap } from "lucide-react";
@@ -27,6 +27,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Top Right Extension Button */}
+      <div className="fixed top-4 right-4 z-50">
+        <ExtensionButton />
+      </div>
+
       <div className="max-w-4xl mx-auto px-4 py-12 sm:py-16">
         {/* Header */}
         <header className="text-center mb-12">
@@ -41,9 +46,6 @@ const Index = () => {
             Get honest, data-driven feedback on your content ideas before wasting time on mediocre posts.
           </p>
         </header>
-
-        {/* Extension Banner */}
-        <ExtensionBanner />
 
         {/* Main Content */}
         <div className="space-y-10">
