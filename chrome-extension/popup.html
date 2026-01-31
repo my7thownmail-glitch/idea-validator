@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Content Idea Validator</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="title">Content Idea Validator</h1>
+      <p class="subtitle">Brutally honest AI feedback</p>
+    </header>
+
+    <form id="validator-form" class="form">
+      <div class="form-group">
+        <label for="idea-input">Your Content Idea</label>
+        <textarea 
+          id="idea-input" 
+          placeholder="Paste or type your content idea..."
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="platform-select">Platform</label>
+          <select id="platform-select">
+            <option value="youtube-shorts">YouTube Shorts</option>
+            <option value="youtube-long">YouTube Long-form</option>
+            <option value="tiktok">TikTok</option>
+            <option value="instagram-reels">Instagram Reels</option>
+            <option value="x">X (Twitter)</option>
+            <option value="linkedin">LinkedIn</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="content-type">Content Type</label>
+          <select id="content-type">
+            <option value="entertainment">Entertainment</option>
+            <option value="educational">Educational</option>
+            <option value="ai-tech">AI/Tech</option>
+            <option value="lifestyle">Lifestyle</option>
+            <option value="business">Business</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="audience-level">Audience</label>
+          <select id="audience-level">
+            <option value="mass">Mass Market</option>
+            <option value="niche">Niche</option>
+            <option value="expert">Expert</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="goal-select">Goal</label>
+          <select id="goal-select">
+            <option value="viral">Go Viral</option>
+            <option value="engagement">Max Engagement</option>
+            <option value="authority">Build Authority</option>
+            <option value="conversion">Drive Conversions</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="toggle-row">
+        <label class="toggle-label">
+          <input type="checkbox" id="trend-awareness" checked>
+          <span class="toggle-text">Enable Trend Awareness</span>
+        </label>
+      </div>
+
+      <button type="submit" id="validate-btn" class="validate-btn">
+        <span class="btn-text">Validate Idea</span>
+        <span class="btn-loading hidden">
+          <svg class="spinner" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" stroke-dasharray="31.4 31.4" stroke-linecap="round"/>
+          </svg>
+          Analyzing...
+        </span>
+      </button>
+    </form>
+
+    <div id="error-message" class="error-message hidden"></div>
+
+    <div id="results" class="results hidden">
+      <!-- Scores Grid -->
+      <div class="scores-grid">
+        <div class="score-card" id="virality-score">
+          <span class="score-label">Virality</span>
+          <span class="score-value">--</span>
+        </div>
+        <div class="score-card" id="originality-score">
+          <span class="score-label">Originality</span>
+          <span class="score-value">--</span>
+        </div>
+        <div class="score-card" id="saturation-score">
+          <span class="score-label">Saturation</span>
+          <span class="score-value">--</span>
+        </div>
+        <div class="score-card" id="execution-score">
+          <span class="score-label">Execution</span>
+          <span class="score-value">--</span>
+        </div>
+      </div>
+
+      <!-- Verdict -->
+      <div class="result-card verdict-card">
+        <h3 class="card-title">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          Verdict
+        </h3>
+        <p id="verdict-text" class="verdict-text"></p>
+      </div>
+
+      <!-- Final Recommendation -->
+      <div class="result-card recommendation-card">
+        <h3 class="card-title">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          Recommendation
+        </h3>
+        <div id="recommendation-badge" class="recommendation-badge"></div>
+      </div>
+
+      <!-- Hook Strength -->
+      <div class="result-card">
+        <h3 class="card-title">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          Hook Strength
+        </h3>
+        <div class="hook-header">
+          <span id="hook-type" class="hook-type"></span>
+          <span id="hook-score" class="hook-score"></span>
+        </div>
+        <div class="progress-bar">
+          <div id="hook-progress" class="progress-fill"></div>
+        </div>
+        <p id="hook-verdict" class="small-text"></p>
+        <ul id="hook-explanations" class="bullet-list"></ul>
+        <div id="hook-improved" class="improved-hook"></div>
+      </div>
+
+      <!-- Effort vs Reward -->
+      <div class="result-card">
+        <h3 class="card-title">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20V10"/>
+            <path d="M18 20V4"/>
+            <path d="M6 20v-4"/>
+          </svg>
+          Effort vs Reward
+        </h3>
+        <div class="effort-reward-bars">
+          <div class="bar-group">
+            <span class="bar-label">Effort</span>
+            <div class="progress-bar">
+              <div id="effort-progress" class="progress-fill effort-fill"></div>
+            </div>
+            <span id="effort-value" class="bar-value"></span>
+          </div>
+          <div class="bar-group">
+            <span class="bar-label">Reward</span>
+            <div class="progress-bar">
+              <div id="reward-progress" class="progress-fill reward-fill"></div>
+            </div>
+            <span id="reward-value" class="bar-value"></span>
+          </div>
+        </div>
+        <div id="effort-verdict" class="effort-verdict"></div>
+      </div>
+
+      <!-- Series Potential -->
+      <div class="result-card">
+        <h3 class="card-title">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/>
+            <rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          Series Potential
+        </h3>
+        <div id="series-badge" class="series-badge"></div>
+        <div id="series-angle" class="series-angle"></div>
+        <ul id="series-ideas" class="bullet-list numbered"></ul>
+      </div>
+
+      <!-- Trend Analysis (conditional) -->
+      <div id="trend-section" class="trend-section hidden">
+        <div class="result-card">
+          <h3 class="card-title">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+              <polyline points="17 6 23 6 23 12"/>
+            </svg>
+            Trend Insight
+          </h3>
+          <div class="trend-header">
+            <div id="trend-status-badge" class="trend-status-badge"></div>
+            <div class="trend-metrics">
+              <span>Saturation: <strong id="trend-saturation">--</strong>%</span>
+              <span>Timing: <strong id="trend-timing">--</strong>%</span>
+            </div>
+          </div>
+          <p id="trend-insight" class="small-text"></p>
+        </div>
+
+        <div id="trend-warning-card" class="result-card warning-card hidden">
+          <h3 class="card-title warning">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            Trend Risk Warning
+          </h3>
+          <p id="trend-warning" class="warning-text"></p>
+        </div>
+
+        <div class="result-card">
+          <h3 class="card-title">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Trend-Adjusted Advice
+          </h3>
+          <ul id="trend-advice" class="bullet-list"></ul>
+        </div>
+      </div>
+
+      <!-- Why May Fail/Win -->
+      <div class="result-card">
+        <h3 class="card-title danger">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="15" y1="9" x2="9" y2="15"/>
+            <line x1="9" y1="9" x2="15" y2="15"/>
+          </svg>
+          Why This May Fail
+        </h3>
+        <ul id="may-fail" class="bullet-list danger"></ul>
+      </div>
+
+      <div class="result-card">
+        <h3 class="card-title success">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+            <polyline points="17 6 23 6 23 12"/>
+          </svg>
+          Why This May Win
+        </h3>
+        <ul id="may-win" class="bullet-list success"></ul>
+      </div>
+
+      <!-- Fix Suggestions -->
+      <div class="result-card">
+        <h3 class="card-title">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="9" y1="18" x2="15" y2="18"/>
+            <line x1="10" y1="22" x2="14" y2="22"/>
+            <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/>
+          </svg>
+          Fix Suggestions
+        </h3>
+        <div class="suggestions-section">
+          <h4>Hook Improvements</h4>
+          <ul id="hook-improvements" class="bullet-list"></ul>
+        </div>
+        <div class="suggestions-section">
+          <h4>Angle Changes</h4>
+          <ul id="angle-changes" class="bullet-list"></ul>
+        </div>
+        <div class="suggestions-section">
+          <h4>Platform Suggestions</h4>
+          <ul id="platform-suggestions" class="bullet-list"></ul>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        <button id="copy-btn" class="action-btn">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          Copy Feedback
+        </button>
+        <button id="new-btn" class="action-btn secondary">New Idea</button>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div id="history-section" class="history-section">
+      <h3 class="history-title">Recent Validations</h3>
+      <div id="history-list" class="history-list"></div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
