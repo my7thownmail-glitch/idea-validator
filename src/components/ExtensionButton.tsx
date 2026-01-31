@@ -20,7 +20,7 @@ export const ExtensionButton = () => {
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 border border-primary/40 bg-primary/5 hover:bg-primary/15 hover:border-primary/60 shadow-[0_0_12px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300"
+              className="h-9 w-9 border border-primary/40 bg-primary/5 hover:bg-primary/15 hover:border-primary/60 shadow-[0_0_12px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_20px_hsl(var(--primary)/0.5)] transition-all duration-300 animate-[pulse_3s_ease-in-out_infinite]"
               asChild
             >
               <a
