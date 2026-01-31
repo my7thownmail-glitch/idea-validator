@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ValidatorForm, FormData } from "@/components/ValidatorForm";
 import { ValidationResults, ValidationResult } from "@/components/ValidationResults";
+import { ExtensionBanner } from "@/components/ExtensionBanner";
 import { validateIdea } from "@/lib/validateIdea";
 import { toast } from "sonner";
 import { Zap } from "lucide-react";
@@ -40,6 +41,9 @@ const Index = () => {
             Get honest, data-driven feedback on your content ideas before wasting time on mediocre posts.
           </p>
         </header>
+
+        {/* Extension Banner */}
+        <ExtensionBanner />
 
         {/* Main Content */}
         <div className="space-y-10">
