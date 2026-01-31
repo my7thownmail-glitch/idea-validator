@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ValidatorForm, FormData } from "@/components/ValidatorForm";
 import { ValidationResults, ValidationResult } from "@/components/ValidationResults";
-import { validateIdea } from "@/lib/mockValidation";
+import { validateIdea } from "@/lib/validateIdea";
 import { toast } from "sonner";
 import { Zap } from "lucide-react";
 
