@@ -7,8 +7,20 @@ import {
   Zap, 
   Lightbulb,
   Target,
-  TrendingUp
+  TrendingUp,
+  TrendingDown,
+  Clock,
+  Minus
 } from "lucide-react";
+
+export interface TrendAnalysis {
+  trendStatus: "rising" | "peaked" | "declining" | "evergreen";
+  trendSaturation: number;
+  timingEffectiveness: number;
+  trendInsight: string;
+  trendRiskWarning?: string;
+  trendAdjustedAdvice: string[];
+}
 
 export interface ValidationResult {
   scores: {
@@ -28,11 +40,46 @@ export interface ValidationResult {
     platformSuggestions: string[];
   };
   finalRecommendation: "publish" | "publish-with-changes" | "drop";
+  trendAnalysis?: TrendAnalysis;
 }
 
 interface ValidationResultsProps {
   result: ValidationResult;
 }
+
+const TrendStatusBadge = ({ status }: { status: TrendAnalysis["trendStatus"] }) => {
+  const config = {
+    rising: {
+      icon: <TrendingUp className="h-4 w-4" />,
+      label: "Rising",
+      className: "bg-success/20 text-success border-success/40",
+    },
+    peaked: {
+      icon: <Minus className="h-4 w-4" />,
+      label: "Peaked",
+      className: "bg-warning/20 text-warning border-warning/40",
+    },
+    declining: {
+      icon: <TrendingDown className="h-4 w-4" />,
+      label: "Declining",
+      className: "bg-danger/20 text-danger border-danger/40",
+    },
+    evergreen: {
+      icon: <Clock className="h-4 w-4" />,
+      label: "Evergreen",
+      className: "bg-primary/20 text-primary border-primary/40",
+    },
+  };
+
+  const { icon, label, className } = config[status];
+
+  return (
+    <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-md border text-sm font-medium ${className}`}>
+      {icon}
+      {label}
+    </div>
+  );
+};
 
 const RecommendationBadge = ({ recommendation }: { recommendation: ValidationResult["finalRecommendation"] }) => {
   const config = {
@@ -172,6 +219,54 @@ export function ValidationResults({ result }: ValidationResultsProps) {
         </div>
       </ResultCard>
 
+      {/* Trend Analysis Section */}
+      {result.trendAnalysis && (
+        <>
+          <ResultCard 
+            title="Trend Insight" 
+            icon={<TrendingUp className="h-5 w-5" />}
+          >
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <TrendStatusBadge status={result.trendAnalysis.trendStatus} />
+                <div className="flex gap-4 text-sm">
+                  <span className="text-muted-foreground">
+                    Saturation: <span className="text-foreground font-medium">{result.trendAnalysis.trendSaturation}%</span>
+                  </span>
+                  <span className="text-muted-foreground">
+                    Timing: <span className="text-foreground font-medium">{result.trendAnalysis.timingEffectiveness}%</span>
+                  </span>
+                </div>
+              </div>
+              <p className="text-sm">{result.trendAnalysis.trendInsight}</p>
+            </div>
+          </ResultCard>
+
+          {result.trendAnalysis.trendRiskWarning && (
+            <ResultCard 
+              title="Trend Risk Warning" 
+              icon={<AlertTriangle className="h-5 w-5 text-warning" />}
+            >
+              <p className="text-sm text-warning">{result.trendAnalysis.trendRiskWarning}</p>
+            </ResultCard>
+          )}
+
+          <ResultCard 
+            title="Trend-Adjusted Advice" 
+            icon={<Clock className="h-5 w-5" />}
+          >
+            <ul className="space-y-2">
+              {result.trendAnalysis.trendAdjustedAdvice.map((advice, i) => (
+                <li key={i} className="flex items-start gap-2 text-sm">
+                  <span className="text-primary mt-1">→</span>
+                  <span>{advice}</span>
+                </li>
+              ))}
+            </ul>
+          </ResultCard>
+        </>
+      )}
+
       {/* Final Recommendation */}
       <ResultCard 
         title="Final Recommendation" 
@@ -180,6 +275,11 @@ export function ValidationResults({ result }: ValidationResultsProps) {
       >
         <div className="pt-2">
           <RecommendationBadge recommendation={result.finalRecommendation} />
+          {result.trendAnalysis && (
+            <p className="text-xs text-muted-foreground mt-2">
+              This recommendation factors in current trend timing and saturation.
+            </p>
+          )}
         </div>
       </ResultCard>
     </div>

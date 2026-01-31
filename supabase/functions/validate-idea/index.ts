@@ -5,12 +5,21 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const systemPrompt = `You are a brutally honest content strategist and data analyst. Your job is to evaluate content ideas critically without any motivational fluff.
+const baseSystemPrompt = `You are a brutally honest content strategist and data analyst. Your job is to evaluate content ideas critically without any motivational fluff.
 
 You must respond with ONLY valid JSON (no markdown, no code blocks, no explanations outside the JSON).
 
-Analyze the content idea and return a JSON object with this exact structure:
-{
+Be harsh but constructive. Consider:
+- Platform-specific algorithms and best practices
+- Current market saturation for the content type
+- Audience attention spans and preferences
+- Trending patterns and timing
+- Execution complexity and production requirements
+
+Never use motivational language. Be direct, analytical, and creator-focused.`;
+
+const getSystemPrompt = (trendAwareness: boolean) => {
+  const baseStructure = `{
   "scores": {
     "viralityPotential": <number 0-100>,
     "originality": <number 0-100>,
@@ -27,17 +36,47 @@ Analyze the content idea and return a JSON object with this exact structure:
     "angleChanges": ["<suggestion 1>", "<suggestion 2>", "<suggestion 3>"],
     "platformSuggestions": ["<suggestion 1>", "<suggestion 2>", "<suggestion 3>"]
   },
-  "finalRecommendation": "<one of: publish | publish-with-changes | drop>"
+  "finalRecommendation": "<one of: publish | publish-with-changes | drop>"`;
+
+  if (trendAwareness) {
+    return `${baseSystemPrompt}
+
+TREND AWARENESS MODE ENABLED:
+- Infer the relevant trend category for this content idea automatically
+- Analyze the idea's timing relative to current content trends
+- Evaluate trend status (rising, peaked, declining, or evergreen)
+- Factor trend saturation and timing into your scoring
+- Adjust viralityPotential and saturationRisk scores based on trend timing
+- If the trend is declining or oversaturated, lower scores accordingly
+- If the trend is rising with low saturation, boost scores appropriately
+- The final recommendation MUST explicitly consider timing, not just idea quality
+
+Analyze the content idea and return a JSON object with this exact structure:
+${baseStructure},
+  "trendAnalysis": {
+    "trendStatus": "<one of: rising | peaked | declining | evergreen>",
+    "trendSaturation": <number 0-100, how saturated this trend is>,
+    "timingEffectiveness": <number 0-100, how well-timed this idea is>,
+    "trendInsight": "<1-2 sentences analyzing the current state of this trend>",
+    "trendRiskWarning": "<optional: warning if timing is risky, omit if not applicable>",
+    "trendAdjustedAdvice": ["<timing-specific advice 1>", "<timing-specific advice 2>", "<timing-specific advice 3>"]
+  }
 }
 
-Be harsh but constructive. Consider:
-- Platform-specific algorithms and best practices
-- Current market saturation for the content type
-- Audience attention spans and preferences
-- Trending patterns and timing
-- Execution complexity and production requirements
+IMPORTANT for trend analysis:
+- Be realistic about trend lifecycles
+- No hype - if a trend is dying, say so directly
+- Consider platform-specific trend dynamics
+- Account for geographic and demographic trend variations
+- Evergreen content should be marked as such, not forced into trend categories`;
+  }
 
-Never use motivational language. Be direct, analytical, and creator-focused.`;
+  return `${baseSystemPrompt}
+
+Analyze the content idea and return a JSON object with this exact structure:
+${baseStructure}
+}`;
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -45,7 +84,7 @@ serve(async (req) => {
   }
 
   try {
-    const { idea, platform, contentType, audienceLevel, goal } = await req.json();
+    const { idea, platform, contentType, audienceLevel, goal, trendAwareness = false } = await req.json();
 
     if (!idea || !platform || !contentType || !audienceLevel || !goal) {
       return new Response(
@@ -53,6 +92,8 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    const systemPrompt = getSystemPrompt(trendAwareness);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -67,6 +108,7 @@ Platform: ${platform}
 Content Type: ${contentType}
 Audience Level: ${audienceLevel}
 Goal: ${goal}
+${trendAwareness ? "\nTrend Awareness: ENABLED - Analyze timing and trend factors" : ""}
 
 Analyze this critically and provide your assessment.`;
 
