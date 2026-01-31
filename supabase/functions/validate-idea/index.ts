@@ -36,7 +36,58 @@ const getSystemPrompt = (trendAwareness: boolean) => {
     "angleChanges": ["<suggestion 1>", "<suggestion 2>", "<suggestion 3>"],
     "platformSuggestions": ["<suggestion 1>", "<suggestion 2>", "<suggestion 3>"]
   },
+  "hookAnalysis": {
+    "hookStrengthScore": <number 0-100>,
+    "detectedHookType": "<one of: shock | curiosity | contrast | authority | story>",
+    "strengthExplanation": ["<reason 1>", "<reason 2>"],
+    "improvedHookExample": "<single sentence improved hook>"
+  },
+  "effortRewardAnalysis": {
+    "effortScore": <number 0-100, higher means more effort required>,
+    "rewardScore": <number 0-100, higher means more potential reward>,
+    "ratioVerdict": "<one of: worth-it | risky | not-worth-it>"
+  },
+  "seriesPotentialAnalysis": {
+    "seriesPotential": "<one of: high | medium | low>",
+    "suggestedSeriesAngle": "<optional: suggested series angle if high/medium>",
+    "episodeIdeas": ["<optional: episode idea 1>", "<episode idea 2>", "<episode idea 3>"]
+  },
   "finalRecommendation": "<one of: publish | publish-with-changes | drop>"`;
+
+  const hookAnalysisInstructions = `
+HOOK STRENGTH ANALYSIS:
+- Infer the implied hook from the idea's opening angle
+- Evaluate: curiosity gap, emotional trigger, pattern interrupt strength
+- Do NOT rewrite the full idea, just analyze the hook
+- Provide 1-2 bullet explanations of why it's weak or strong
+- Give ONE improved hook example as a single sentence
+- Hook types: shock (alarming), curiosity (mystery), contrast (before/after), authority (expert), story (narrative)
+
+EFFORT VS REWARD ANALYSIS:
+- Evaluate: time required, skill complexity, production difficulty, expected reach
+- Short-form ideas should penalize high effort
+- Long execution chains reduce reward score
+- Be blunt about whether the effort is justified
+
+SERIES POTENTIAL DETECTION:
+- Analyze: topic depth, angle expandability, audience retention potential
+- If high/medium potential: provide a series angle and 2-3 episode title ideas
+- If low: omit the optional fields`;
+
+  const finalRecommendationInstructions = `
+FINAL RECOMMENDATION MUST CONSIDER ALL FACTORS:
+- Trend timing (if trend awareness enabled)
+- Virality potential
+- Saturation risk
+- Hook strength
+- Effort vs reward ratio
+- Series potential
+
+Examples of integrated recommendations:
+- "Good idea, weak hook — rework opening."
+- "Strong concept, bad effort-to-reward ratio."
+- "Convert this into a series before publishing."
+- "Trend is dying and hook is generic — drop it."`;
 
   if (trendAwareness) {
     return `${baseSystemPrompt}
@@ -49,7 +100,8 @@ TREND AWARENESS MODE ENABLED:
 - Adjust viralityPotential and saturationRisk scores based on trend timing
 - If the trend is declining or oversaturated, lower scores accordingly
 - If the trend is rising with low saturation, boost scores appropriately
-- The final recommendation MUST explicitly consider timing, not just idea quality
+${hookAnalysisInstructions}
+${finalRecommendationInstructions}
 
 Analyze the content idea and return a JSON object with this exact structure:
 ${baseStructure},
@@ -72,6 +124,8 @@ IMPORTANT for trend analysis:
   }
 
   return `${baseSystemPrompt}
+${hookAnalysisInstructions}
+${finalRecommendationInstructions}
 
 Analyze the content idea and return a JSON object with this exact structure:
 ${baseStructure}

@@ -29,7 +29,8 @@ export async function validateIdea(data: FormData): Promise<ValidationResult> {
   const result = await response.json();
   
   // Validate the response structure
-  if (!result.scores || !result.verdict || !result.finalRecommendation) {
+  if (!result.scores || !result.verdict || !result.finalRecommendation || 
+      !result.hookAnalysis || !result.effortRewardAnalysis || !result.seriesPotentialAnalysis) {
     throw new Error("Invalid response structure from AI");
   }
 
