@@ -49,11 +49,11 @@ export const ExtensionBanner = () => {
               asChild
             >
               <a
-                href="https://chrome.google.com/webstore"
+                href="https://github.com/my7thownmail-glitch/idea-validator/tree/main/chrome-extension"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Get Extension
+                Download Extension
               </a>
             </Button>
           </div>
