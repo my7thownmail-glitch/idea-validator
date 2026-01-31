@@ -1,5 +1,8 @@
 import { ScoreCard } from "@/components/ui/ScoreCard";
 import { ResultCard } from "@/components/ui/ResultCard";
+import { HookStrengthCard, HookAnalysis } from "@/components/analysis/HookStrengthCard";
+import { EffortRewardCard, EffortRewardAnalysis } from "@/components/analysis/EffortRewardCard";
+import { SeriesPotentialCard, SeriesPotentialAnalysis } from "@/components/analysis/SeriesPotentialCard";
 import { 
   AlertTriangle, 
   CheckCircle2, 
@@ -39,6 +42,9 @@ export interface ValidationResult {
     angleChanges: string[];
     platformSuggestions: string[];
   };
+  hookAnalysis: HookAnalysis;
+  effortRewardAnalysis: EffortRewardAnalysis;
+  seriesPotentialAnalysis: SeriesPotentialAnalysis;
   finalRecommendation: "publish" | "publish-with-changes" | "drop";
   trendAnalysis?: TrendAnalysis;
 }
@@ -173,6 +179,13 @@ export function ValidationResults({ result }: ValidationResultsProps) {
             ))}
           </ul>
         </ResultCard>
+      </div>
+
+      {/* New Analysis Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <HookStrengthCard analysis={result.hookAnalysis} />
+        <EffortRewardCard analysis={result.effortRewardAnalysis} />
+        <SeriesPotentialCard analysis={result.seriesPotentialAnalysis} />
       </div>
 
       {/* Fix Suggestions */}
